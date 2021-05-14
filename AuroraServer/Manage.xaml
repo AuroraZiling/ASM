@@ -1,0 +1,32 @@
+﻿<controls:MetroWindow x:Class="AuroraServer.Manage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AuroraServer"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="ASM - Manage" Height="450" Width="800" TitleCharacterCasing="Normal" ResizeMode="NoResize">
+    <controls:MetroWindow.Background>
+        <ImageBrush ImageSource="background.png"/>
+    </controls:MetroWindow.Background>
+    <Grid>
+        <Grid HorizontalAlignment="Left" Height="420" VerticalAlignment="Top" Width="794" Margin="0,0,-0.4,0">
+            <Grid.Background>
+                <SolidColorBrush Color="White" Opacity="0.8"/>
+            </Grid.Background>
+            <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Margin="10,25,0,40" Width="774" IsReadOnly="True">
+                <FlowDocument>
+                    <Paragraph>
+                        <Run Text="Aurora Server Manager Starting..."/>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+            <Label Content="Command:" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="CommandText" Height="23" Margin="87,385,100,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <Button x:Name="CommandRunBtn" Content="Run" HorizontalAlignment="Left" Margin="699,386,0,0" VerticalAlignment="Top" Width="85" RenderTransformOrigin="0.317,0.334" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" controls:ControlsHelper.ContentCharacterCasing="Normal" Height="24" Click="CommandRunBtn_Click"/>
+            <Label Content="Console:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+        </Grid>
+
+    </Grid>
+</controls:MetroWindow>
