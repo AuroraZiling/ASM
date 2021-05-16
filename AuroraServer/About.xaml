@@ -1,0 +1,52 @@
+﻿<controls:MetroWindow x:Class="AuroraServer.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AuroraServer"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        Title="ASM - About" Height="450" Width="800" TitleCharacterCasing="Normal" ResizeMode="NoResize">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="background.png"/>
+        </Grid.Background>
+        <Grid HorizontalAlignment="Left" Height="420" VerticalAlignment="Top" Width="808" Margin="0,0,-14.4,0">
+            <Grid.Background>
+                <SolidColorBrush Color="White"/>
+            </Grid.Background>
+            <controls:MetroTabControl HorizontalAlignment="Left" Height="420" VerticalAlignment="Top" Width="794">
+                <TabItem Header="Author" Margin="0,0,-10.2,-1.6" Background="White">
+                    <Grid Background="#FFE5E5E5">
+                        <Border CornerRadius="50" BorderBrush="#FFA2A2AE" BorderThickness="2" Margin="310,22,309,185.4">
+                            <Border.Background>
+                                <ImageBrush ImageSource="head.jpg" />
+                            </Border.Background>
+                        </Border>
+                        <Label Content="Aurora" Margin="359,202,359.6,0" VerticalAlignment="Top" FontSize="20"/>
+                        <Label Content="  C#, Python, C++ Developer&#xA;Student, Player&#xD;&#xA;&#xD;&#xA;Mail: auroraziling@foxmail.com" HorizontalAlignment="Left" Margin="301,237,0,0" VerticalAlignment="Top" Width="192" Foreground="#FF686868"/>
+                        <Button x:Name="AuthorVisitGithubBtn" Content="Visit Github" HorizontalAlignment="Left" Margin="310,315,0,0" VerticalAlignment="Top" Width="175" controls:ControlsHelper.ContentCharacterCasing="Normal" Click="AuthorVisitGithubBtn_Click"/>
+                        <Label Content="Other Contacts:" HorizontalAlignment="Left" Margin="10,284,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+                        <Button x:Name="AuthorVisitAfdianBtn" Content="Afdian.net" HorizontalAlignment="Left" Margin="10,315,0,0" VerticalAlignment="Top" Width="104" controls:ControlsHelper.ContentCharacterCasing="Normal" Click="AuthorVisitAfdianBtn_Click"/>
+                        <Button x:Name="AuthorVisitQQBtn" Content="QQ" HorizontalAlignment="Left" Margin="119,315,0,0" VerticalAlignment="Top" Width="104" controls:ControlsHelper.ContentCharacterCasing="Normal" Click="AuthorVisitQQBtn_Click"/>
+
+                    </Grid>
+                </TabItem>
+                <TabItem Header="  Legal Statement" Margin="10.2,0,-28,-1.6">
+                    <Grid Background="#FFE5E5E5">
+                        <Label Content="Disclaimers" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                        <Label Content="The copyright of all resources provided by this software belongs to their copyright owners. &#xD;&#xA;If legal disputes and consequences result from the use of this software,&#xD;&#xA; you are responsible for them and this software is not responsible for them. &#xD;&#xA;Use of this software means that the user is aware of the above content." HorizontalAlignment="Left" Margin="40,40,0,0" VerticalAlignment="Top" Height="70"/>
+                        <Label Content="Privacy Policy" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
+                        <Label Content="The software will not upload any information about you." HorizontalAlignment="Left" Margin="40,147,0,0" VerticalAlignment="Top" Height="26"/>
+                        <Label Content="Service Discontinuation" HorizontalAlignment="Left" Margin="10,178,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
+                        <Label Content="If a cracked version of the Software is used, or if an unofficial version of the Software is decompiled, &#xD;&#xA;distributed or tampered with, the Developer reserves the right to suspend the provision of some or all services to the User. &#xD;&#xA;The user is liable for all corresponding legal responsibilities." HorizontalAlignment="Left" Margin="40,210,0,0" VerticalAlignment="Top" Height="57"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="  License and Copyright Notice" Margin="27,0,-54,-0.6">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+            </controls:MetroTabControl>
+        </Grid>
+
+    </Grid>
+</controls:MetroWindow>

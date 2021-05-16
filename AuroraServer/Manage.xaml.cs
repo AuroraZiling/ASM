@@ -5,21 +5,16 @@ using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace AuroraServer
 {
@@ -29,7 +24,7 @@ namespace AuroraServer
         public ushort Port = 25575;
         public string Password = "";
         public string Log = "Aurora Server Manager Starting...";
-
+        public string[] PlayerInfo = { };
         public static string now_path = Environment.CurrentDirectory.Replace("\\", "/") + "/";
         public Manage()
         {
@@ -37,7 +32,9 @@ namespace AuroraServer
             MessageExt.Instance.ShowYesNo = ShowYesNo;
             InitializeComponent();
 
-            using (StreamReader file = File.OpenText(now_path + "ASM/connect.json"))
+            this.Closing += Window_Closing;
+
+            using(StreamReader file = File.OpenText(now_path + "ASM/connect.json")) //读取ASM/connect.json文件
             {
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
@@ -53,20 +50,110 @@ namespace AuroraServer
                     Password = o["Password"].ToString();
                 }
             }
-
-            ConsoleControl();
+            ConsoleControl(); //开启控制台
         }
 
-        public async void ConsoleControl()
+        public async void PlayerNumUpdate() //玩家人数刷新
         {
-            var rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+            RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+            await rcon.ConnectAsync();
+            while (true)
+            {
+                var ret = await rcon.SendCommandAsync("list");
+                ret = ret.Replace("There are ", "").Replace(" of a max of 10 players online", "");
+                string[] PlayerInfo = Regex.Split(ret, ": ", RegexOptions.IgnoreCase);
+                string[] PlayerList = new string[] { };
+                try
+                {
+                    PlayerList = Regex.Split(PlayerInfo[1], ", ", RegexOptions.IgnoreCase);
+                }
+                catch
+                {
+                    PlayerList = new string[] { }; 
+                }
+                PlayerInfo[0] = Regex.Split(ret, ":", RegexOptions.IgnoreCase)[0];
+                ushort PlayerNum = ushort.Parse(PlayerInfo[0]);
+
+                if (PlayerList.Length == 0)
+                {
+                    PlayerListBox.Items.Clear();
+                }
+                string[] PlayerListShow = { };
+                List<string> PlayerListShowTemp = new List<string> { };
+                for (int i = 0; i < PlayerList.Length; ++i) //PlayerListBox.Items与PlayerList差异添加
+                {
+                    if (PlayerListBox.Items.IndexOf(PlayerList[i]) == -1)
+                    {
+                        PlayerListBox.Items.Add(PlayerList[i]);
+                    }
+                }
+                foreach (string i in PlayerListBox.Items) //避免foreach不可中途删除导致的错误
+                {
+                    PlayerListShowTemp.Add(i);
+                }
+                PlayerListShow = PlayerListShowTemp.ToArray();
+                for (int i = 0; i < PlayerListShow.Length; ++i) //PlayerListBox.Items与PlayerList差异删除
+                {
+                    try
+                    {
+                        if (PlayerListBox.Items.IndexOf(PlayerList[i]) == -1)
+                        {
+                            PlayerListBox.Items.Remove(PlayerList[i]);
+                        }
+                    }
+                    catch
+                    {
+                        PlayerListBox.Items.Remove(PlayerListShow[i]); ;
+                    }
+                }
+
+                if (PlayerNum == 0 || PlayerNum == 1)
+                {
+                    PlayerNumLabel.Content = PlayerInfo[0] + " Player Online";
+                }
+                else
+                {
+                    PlayerNumLabel.Content = PlayerInfo[0] + " Players Online";
+                }
+                await Task.Delay(1000);
+            }
+        }
+
+        public async void ConsoleControl() //控制台
+        {
             LogUpdate("\nTrying to connect to the target server...", null);
             try
             {
+                RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
                 await rcon.ConnectAsync();
-                LogUpdate("\nRCON server has been successfully connected. IP:"+IP_address+" Port:"+Port.ToString(), null);
                 Title = "ASM - Manage for " + IP_address + ':' + Port.ToString();
-                LogUpdate("\n>>>", null);
+                LogUpdate("\nRCON server has been successfully connected. IP:"+IP_address+" Port:"+Port.ToString(), null);
+                /*
+                LogUpdate("\nTrying to open the listening interface...", null);
+                Task PlayerListener = Task.Run(() => // 监听玩家聊天(未完成)
+                {
+                    while (true)
+                    {
+                        var log = new LogReceiver(50000, new IPEndPoint(IPAddress.Parse(IP_address), Port));
+                        log.Listen<ChatMessage>(chat =>
+                        {
+                            LogUpdate($"Chat message: {chat.Player.Name} said {chat.Message} on channel {chat.Channel}", null);
+                        });
+                        log.Dispose();
+                    }
+                });
+                LogUpdate("\nListening interface has been successfully opened.", null);
+                */
+                LogUpdate("\nTrying to open the player detection system...", null);
+                //await PlayerNumUpdate();
+                Task PlayerUpdate = Task.Run(() => // 监听玩家聊天(未完成)
+                {
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        PlayerNumUpdate();
+                    }));
+                });
+                LogUpdate("\nPlayer detection system has been successfully opened.", null);
             }
             catch (AuthenticationException)
             {
@@ -74,7 +161,7 @@ namespace AuroraServer
             }
         }
 
-        public void LogUpdate(string UpdateStr, string commandipt)
+        public void LogUpdate(string UpdateStr, string commandipt) //控制台信息更新
         {
             if (commandipt == null)
             {
@@ -82,7 +169,7 @@ namespace AuroraServer
             }
             else
             {
-                Log += commandipt + "\n" + UpdateStr + "\n\n>>>";
+                Log += commandipt + "\n" + UpdateStr + "\n";
             }
             
             Run r = new Run(Log);
@@ -92,7 +179,7 @@ namespace AuroraServer
             ConsoleTextBox.Document.Blocks.Add(para);
         }
 
-        public static void ExtractResFile(string resFileName, string outputFile)
+        public static void ExtractResFile(string resFileName, string outputFile) //将嵌入资源复制至外部文件夹
         {
             BufferedStream inStream = null;
             FileStream outStream = null;
@@ -147,7 +234,7 @@ namespace AuroraServer
             public Action<string, string, Action> ShowYesNo { get; set; }
         }
 
-        public async void ShowDialog(string message, string title) // CustomMsgBox的Box
+        public async void ShowDialog(string message, string title) // CustomMsgBox的对话框
         {
             var mySettings = new MetroDialogSettings()
             {
@@ -156,7 +243,7 @@ namespace AuroraServer
             };
             _ = await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, mySettings);
         }
-        public async void ShowYesNo(string message, string title, Action action) // CustomMsgBox的YNBox
+        public async void ShowYesNo(string message, string title, Action action) // CustomMsgBox的Ok/Cancel对话框
         {
             var mySettings = new MetroDialogSettings()
             {
@@ -184,5 +271,32 @@ namespace AuroraServer
                 LogUpdate(ret, command);
             }
         }
+
+        private void SaveLogBtn_Click(object sender, RoutedEventArgs e)
+        {
+            using (StreamWriter sw = new StreamWriter("ASM/Log.txt"))
+            {
+                    sw.WriteLine(Log);
+            }
+            string line = "";
+            using (StreamReader sr = new StreamReader("ASM/Log.txt"))
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+                    Console.WriteLine(line);
+                }
+            }
+            MessageExt.Instance.ShowYesNo("Successfully saved the log file to \n"+now_path+"ASM/Log.txt"+ "\n\nWhether to open the log file?", "Notice", new Action(() => {
+                    Process.Start(now_path + "ASM/Log.txt");
+            }));
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageExt.Instance.ShowYesNo("Confirm to close this program?", "Warning", new Action(() => { Process.GetCurrentProcess().Kill(); }));
+            e.Cancel = true;
+        }
+
+        
     }
 }

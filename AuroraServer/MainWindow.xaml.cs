@@ -33,15 +33,28 @@ namespace AuroraServer
         public string IP_address = "127.0.0.1";
         public ushort Port = 25575;
         public string Password = "";
+        public string LanguageShow = "zh_CN";
 
         public static string now_path = Environment.CurrentDirectory.Replace("\\", "/") + "/";
         public MainWindow()
         {
             InitializeComponent();
+            this.ShowInTaskbar = true;
+            CheckFiles();
             MessageExt.Instance.ShowDialog = ShowDialog;
             MessageExt.Instance.ShowYesNo = ShowYesNo;
 
-            CheckFiles();
+            
+            using (StreamReader file = File.OpenText(now_path + "ASM/settings.json"))
+            {
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject o = (JObject)JToken.ReadFrom(reader);
+                    LanguageShow = o["Language"].ToString();
+                    Languages.LanguageChanger.Updatelanguage(LanguageShow);
+                    LanguageSelectComboBox.SelectedItem = LanguageShow;
+                }
+            }
             using (StreamReader file = File.OpenText(now_path + "ASM/connect.json"))
             {
                 using (JsonTextReader reader = new JsonTextReader(file))
@@ -73,6 +86,11 @@ namespace AuroraServer
             {
                 File.Create(now_path + "ASM/connect.json").Dispose();
                 ExtractResFile("AuroraServer.ExampleFiles.example_connect.json", now_path + "ASM/connect.json");
+            }
+            if (File.Exists(now_path + "ASM/settings.json") == false)
+            {
+                File.Create(now_path + "ASM/settings.json").Dispose();
+                ExtractResFile("AuroraServer.ExampleFiles.example_settings.json", now_path + "ASM/settings.json");
             }
         }
 
@@ -215,6 +233,9 @@ namespace AuroraServer
 
                             SaveConnectFile(IP_address, Port, Password);
 
+                            this.ShowInTaskbar = false;
+                            this.Visibility = Visibility.Hidden;
+
                             Manage manage_window = new Manage();
                             manage_window.ShowDialog();
                         }
@@ -261,6 +282,40 @@ namespace AuroraServer
             {
                 e.Handled = true;
             }
+        }
+
+        private void AboutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            About about_window = new About();
+            about_window.ShowDialog();
+        }
+
+        private void LanguageSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string LanguageSelection = LanguageSelectComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "");
+            if (LanguageSelection == "简体中文")
+            {
+                LanguageSelection = "zh_CN";
+            }
+            else if (LanguageSelection == "English (US)")
+            {
+                LanguageSelection = "en_US";
+            }
+            try
+            {
+                Languages.LanguageChanger.Updatelanguage(LanguageSelection);
+                string jsonString = File.ReadAllText(now_path + "ASM/settings.json", Encoding.Default);
+                JObject jobject = JObject.Parse(jsonString);
+                jobject["Language"] = LanguageSelection;
+                string convertString = Convert.ToString(jobject);
+                File.WriteAllText(now_path + "ASM/settings.json", convertString);
+            }
+            catch
+            {
+                File.Create(now_path + "ASM/settings.json").Dispose();
+                ExtractResFile("AuroraServer.ExampleFiles.example_settings.json", now_path + "ASM/settings.json");
+            }
+
         }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AuroraServer"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="ASM - Manage" Height="450" Width="800" TitleCharacterCasing="Normal" ResizeMode="NoResize">
+        Title="ASM - Manage" Height="450" Width="796.8" TitleCharacterCasing="Normal" ResizeMode="CanMinimize">
     <controls:MetroWindow.Background>
         <ImageBrush ImageSource="background.png"/>
     </controls:MetroWindow.Background>
@@ -15,17 +15,32 @@
             <Grid.Background>
                 <SolidColorBrush Color="White" Opacity="0.8"/>
             </Grid.Background>
-            <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Margin="10,25,0,40" Width="774" IsReadOnly="True">
+            <RichTextBox x:Name="ConsoleTextBox" Margin="10,60,200,40" IsReadOnly="True">
                 <FlowDocument>
                     <Paragraph>
                         <Run Text="Aurora Server Manager Starting..."/>
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
-            <Label Content="Command:" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="CommandText" Height="23" Margin="87,385,100,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-            <Button x:Name="CommandRunBtn" Content="Run" HorizontalAlignment="Left" Margin="699,386,0,0" VerticalAlignment="Top" Width="85" RenderTransformOrigin="0.317,0.334" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" controls:ControlsHelper.ContentCharacterCasing="Normal" Height="24" Click="CommandRunBtn_Click"/>
-            <Label Content="Console:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+            <Label Content="Command:" HorizontalAlignment="Left" Margin="10,385,0,0" VerticalAlignment="Top" Height="25"/>
+            <TextBox x:Name="CommandText" Height="23" Margin="87,385,290,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <Button x:Name="CommandRunBtn" Content="Run" HorizontalAlignment="Left" Margin="509,385,0,0" VerticalAlignment="Top" Width="85" RenderTransformOrigin="0.317,0.334" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" controls:ControlsHelper.ContentCharacterCasing="Normal" Height="26" Click="CommandRunBtn_Click"/>
+            <Label Content="Console:" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top"/>
+            <Button x:Name="SaveLogBtn" Content="Save Log" HorizontalAlignment="Left" Margin="519,31,0,0" VerticalAlignment="Top" Width="75" controls:ControlsHelper.ContentCharacterCasing="Normal" Click="SaveLogBtn_Click"/>
+            <Menu HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="794" Background="{x:Null}">
+                <MenuItem Header="Status" Background="{x:Null}" />
+                <MenuItem Header="Settings" Background="{x:Null}" />
+                <MenuItem Header="Help" Background="{x:Null}" />
+            </Menu>
+            <Frame Content="Frame" HorizontalAlignment="Left" Height="1" Margin="0,28,0,0" VerticalAlignment="Top" Width="790" Background="Black"/>
+            <Frame Content="Frame" HorizontalAlignment="Left" Height="380" Margin="599,31,0,0" VerticalAlignment="Top" Width="1">
+                <Frame.Background>
+                    <SolidColorBrush Color="#FF898989" Opacity="0.8"/>
+                </Frame.Background>
+            </Frame>
+            <Label x:Name="PlayerNumLabel" Content="0 Player Online" HorizontalAlignment="Left" Margin="606,31,0,0" VerticalAlignment="Top" Height="28" Width="178" BorderThickness="1,1,0,0"/>
+            <ListBox x:Name="PlayerListBox" HorizontalAlignment="Left" Height="350" Margin="606,60,0,0" VerticalAlignment="Top" Width="178" BorderThickness="1" BorderBrush="#FFCCCCCC"/>
+
         </Grid>
 
     </Grid>
