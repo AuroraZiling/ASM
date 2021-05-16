@@ -1,2 +1,2 @@
-![ASM](./GithubSources/ASM.png)
+![ASM](./GithubSources/ASM256.png)
 # Aurora Minecraft Server Manager
