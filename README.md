@@ -15,7 +15,6 @@
 
 * [Introduction](#Introduction)
 * [Goals](#Goals)
-* [Contribution](#Contribution)
 
 ## Introduction
 
@@ -27,15 +26,17 @@ The purpose is to lower the threshold of backend operations for managing Minecra
 
 ## Goals
 
-### In 1.X
+### In 1.X (Current)
 
 1. Player count and list display (Incomplete)
 2. Console color output (Incomplete)
 3. Server Status Display (Incomplete)
 
-## Contribution
+### In 2.X
 
-
+1. Automation Management (Incomplete)
+2. Player Chat Listening (Incomplete)
+3. Custom UI (Incomplete)
 
 
 
