@@ -14,8 +14,6 @@
 ## Table of Contents
 
 * [Background](#Background)
-* [Install](#Install)
-* [Usage](#Usage)
 
 ## Background
 
