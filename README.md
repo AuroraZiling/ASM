@@ -14,8 +14,8 @@
 ## Table of Contents
 
 * [Introduction](#Introduction)
- - [In 1.X](#In 1.X)
-* [Future Goals](#Future Goals)
+* [Goals](#Goals)
+* [Contribution](#Contribution)
 
 ## Introduction
 
@@ -25,7 +25,7 @@
 
 The purpose is to lower the threshold of backend operations for managing Minecraft servers.
 
-## Future Goals
+## Goals
 
 ### In 1.X
 
