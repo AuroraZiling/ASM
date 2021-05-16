@@ -14,7 +14,7 @@
 ## Table of Contents
 
 * [Introduction](#Introduction)
-  * [In 1.X](#In 1.X)
+  - [In 1.X](#In 1.X)
 * [Future Goals](#Future Goals)
 
 ## Introduction
