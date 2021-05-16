@@ -4,4 +4,4 @@
 
 # Aurora Minecraft Server Manager
 
-!()(https://img.shields.io/badge/Build-Passing-brightgreen)
+![](https://img.shields.io/badge/Build-Passing-brightgreen)
