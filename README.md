@@ -5,4 +5,4 @@
 # Aurora Minecraft Server Manager
 
 ![](https://img.shields.io/badge/Build-Passing-brightgreen)
-![](https://img.shields.io/badge/Platform-Windows-grey)
+![](https://img.shields.io/badge/Platform-Windows-lightgrey)
