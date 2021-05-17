@@ -9,7 +9,7 @@
 ![](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![](https://img.shields.io/badge/Platform-Windows-lightgrey)
 ![](https://img.shields.io/badge/Language-CSharp-orange)
-![](https://img.shields.io/badge/Version-1.0-blue)
+![](https://img.shields.io/badge/Version-1.1-blue)
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ The purpose is to lower the threshold of backend operations for managing Minecra
 
 ### In 1.X (Current)
 
-1. Player count and list display (Incomplete)
+1. Player count and list display (Completed)
 2. Console color output (Incomplete)
 3. Server Status Display (Incomplete)
 
