@@ -29,7 +29,7 @@ The purpose is to lower the threshold of backend operations for managing Minecra
 ### In 1.X (Current)
 
 1. Player count and list display (Completed)
-2. Console color output (Incomplete)
+2. Console color output (Give Up)
 3. Server Status Display (Incomplete)
 
 ### In 2.X
