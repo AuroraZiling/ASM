@@ -1,5 +1,4 @@
-﻿using CoreRCON.Parsers.Standard;
-using CoreRCON;
+﻿using CoreRCON;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
@@ -12,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Text.RegularExpressions;
-using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 
@@ -23,9 +21,11 @@ namespace AuroraServer
         public string IP_address = "127.0.0.1";
         public ushort Port = 25575;
         public string Password = "";
-        public string Log = "Aurora Server Manager Starting...";
+        public string Log = "系统启动中...";
         public string[] PlayerInfo = { };
         public static string now_path = Environment.CurrentDirectory.Replace("\\", "/") + "/";
+
+        public Paragraph commandTemp = new Paragraph();
         public Manage()
         {
             MessageExt.Instance.ShowDialog = ShowDialog;
@@ -33,6 +33,7 @@ namespace AuroraServer
             InitializeComponent();
 
             this.Closing += Window_Closing;
+            PlayerControlGrid.Visibility = Visibility.Hidden;
 
             using(StreamReader file = File.OpenText(now_path + "ASM/connect.json")) //读取ASM/connect.json文件
             {
@@ -60,25 +61,23 @@ namespace AuroraServer
             while (true)
             {
                 var ret = await rcon.SendCommandAsync("list");
-                ret = ret.Replace("There are ", "").Replace(" of a max of 10 players online", "");
-                string[] PlayerInfo = Regex.Split(ret, ": ", RegexOptions.IgnoreCase);
-                string[] PlayerList = new string[] { };
+                ret = ret.Replace("There are ", "").Replace("a max of ", "").Replace(" players online", "");
+                string[] PlayerInfo = Regex.Split(ret, " of ", RegexOptions.IgnoreCase);
+                string[] PlayerList;
                 try
                 {
-                    PlayerList = Regex.Split(PlayerInfo[1], ", ", RegexOptions.IgnoreCase);
+                    PlayerList = Regex.Split(Regex.Split(PlayerInfo[1], ": ", RegexOptions.IgnoreCase)[1], ", ", RegexOptions.IgnoreCase);
                 }
                 catch
                 {
-                    PlayerList = new string[] { }; 
+                    PlayerList = new string[] { };
                 }
-                PlayerInfo[0] = Regex.Split(ret, ":", RegexOptions.IgnoreCase)[0];
                 ushort PlayerNum = ushort.Parse(PlayerInfo[0]);
 
                 if (PlayerList.Length == 0)
                 {
                     PlayerListBox.Items.Clear();
                 }
-                string[] PlayerListShow = { };
                 List<string> PlayerListShowTemp = new List<string> { };
                 for (int i = 0; i < PlayerList.Length; ++i) //PlayerListBox.Items与PlayerList差异添加
                 {
@@ -91,7 +90,7 @@ namespace AuroraServer
                 {
                     PlayerListShowTemp.Add(i);
                 }
-                PlayerListShow = PlayerListShowTemp.ToArray();
+                string[] PlayerListShow = PlayerListShowTemp.ToArray();
                 for (int i = 0; i < PlayerListShow.Length; ++i) //PlayerListBox.Items与PlayerList差异删除
                 {
                     try
@@ -106,28 +105,21 @@ namespace AuroraServer
                         PlayerListBox.Items.Remove(PlayerListShow[i]); ;
                     }
                 }
-
-                if (PlayerNum == 0 || PlayerNum == 1)
-                {
-                    PlayerNumLabel.Content = PlayerInfo[0] + " Player Online";
-                }
-                else
-                {
-                    PlayerNumLabel.Content = PlayerInfo[0] + " Players Online";
-                }
+                PlayerNumLabel.Content = PlayerInfo[0] + " 个玩家在线";
                 await Task.Delay(1000);
             }
         }
 
         public async void ConsoleControl() //控制台
         {
-            LogUpdate("\nTrying to connect to the target server...", null);
+            LogUpdate("\n正在尝试连接至RCON服务器...", null, null);
             try
             {
                 RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
                 await rcon.ConnectAsync();
-                Title = "ASM - Manage for " + IP_address + ':' + Port.ToString();
-                LogUpdate("\nRCON server has been successfully connected. IP:"+IP_address+" Port:"+Port.ToString(), null);
+                Title = "ASM - 管理: " + IP_address + ':' + Port.ToString();
+                LogUpdate("\nRCON服务器已成功连接 IP:"+IP_address+" Port:"+Port.ToString(), null, null);
+                
                 /*
                 LogUpdate("\nTrying to open the listening interface...", null);
                 Task PlayerListener = Task.Run(() => // 监听玩家聊天(未完成)
@@ -144,32 +136,36 @@ namespace AuroraServer
                 });
                 LogUpdate("\nListening interface has been successfully opened.", null);
                 */
-                LogUpdate("\nTrying to open the player detection system...", null);
-                //await PlayerNumUpdate();
-                Task PlayerUpdate = Task.Run(() => // 监听玩家聊天(未完成)
+                LogUpdate("\n正在尝试打开玩家检测器...", null, null);
+                Task PlayerUpdate = Task.Run(() =>
                 {
                     Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
                         PlayerNumUpdate();
                     }));
                 });
-                LogUpdate("\nPlayer detection system has been successfully opened.", null);
+                LogUpdate("\n玩家检测器已开启", null, null);
+                LogUpdate("\n", null, null);
             }
             catch (AuthenticationException)
             {
-                MessageExt.Instance.ShowDialog("Your RCON password could not be verified, please check if your password is entered correctly.", "Error");
+                MessageExt.Instance.ShowDialog("您的RCON连接密码无法通过验证, 请检查输入的密码是否正确", "错误");
             }
         }
 
-        public void LogUpdate(string UpdateStr, string commandipt) //控制台信息更新
+        public void LogUpdate(string UpdateStr, string commandipt, string originalColor) //控制台信息更新
         {
-            if (commandipt == null)
+            if (commandipt == null && originalColor == null)
             {
                 Log += UpdateStr;
             }
-            else
+            else if(originalColor == null)
             {
-                Log += commandipt + "\n" + UpdateStr + "\n";
+                Log += ">>>" + commandipt;
+                if (UpdateStr != null)
+                {
+                    Log += "\n" + UpdateStr + "\n";
+                }
             }
             
             Run r = new Run(Log);
@@ -238,7 +234,7 @@ namespace AuroraServer
         {
             var mySettings = new MetroDialogSettings()
             {
-                AffirmativeButtonText = "Close",
+                AffirmativeButtonText = "关闭",
                 ColorScheme = MetroDialogColorScheme.Theme
             };
             _ = await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, mySettings);
@@ -247,8 +243,8 @@ namespace AuroraServer
         {
             var mySettings = new MetroDialogSettings()
             {
-                AffirmativeButtonText = "Ok",
-                NegativeButtonText = "Cancel",
+                AffirmativeButtonText = "好",
+                NegativeButtonText = "取消",
                 ColorScheme = MetroDialogColorScheme.Theme
             };
             MessageDialogResult result = await this.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, mySettings);
@@ -264,16 +260,128 @@ namespace AuroraServer
             var ret = await rcon.SendCommandAsync(command);
             if (ret == "")
             {
-                LogUpdate("Command execution completed.", command);
+                LogUpdate("命令成功执行", command, null);
+            }
+            else if (ret.IndexOf('§') == -1)
+            {
+                LogUpdate(ret, command, null);
             }
             else
             {
-                LogUpdate(ret, command);
+                ret = Regex.Replace(ret, @"§[a-g0-9]", "");
+                LogUpdate(ret, command, null);
+                /* 彩色输出(失败)
+                LogUpdate(null, command, null);
+                ret += "§0";
+                string tempStr = "";
+                string[] process = Regex.Split(ret, "\n", RegexOptions.IgnoreCase);
+                string color = "§0";
+                var realColor = Brushes.Black;
+                foreach (string i in process)
+                {
+                    for (int j = 0; j < i.Length; ++j)
+                    {
+                        if (i[j] == '§')
+                        {
+                            if (tempStr != "")
+                            {
+                                if (color == "§0")
+                                {
+                                    realColor = Brushes.Black;
+                                }
+                                else if (color == "§1")
+                                {
+                                    realColor = Brushes.DarkBlue;
+                                }
+                                else if (color == "§2")
+                                {
+                                    realColor = Brushes.DarkGreen;
+                                }
+                                else if (color == "§3")
+                                {
+                                    realColor = Brushes.Aqua; //Wrong
+                                }
+                                else if (color == "§4")
+                                {
+                                    realColor = Brushes.DarkRed;
+                                }
+                                else if (color == "§5")
+                                {
+                                    realColor = Brushes.DarkViolet;
+                                }
+                                else if (color == "§6")
+                                {
+                                    realColor = Brushes.Gold;
+                                }
+                                else if (color == "§7")
+                                {
+                                    realColor = Brushes.Gray;
+                                }
+                                else if (color == "§8")
+                                {
+                                    realColor = Brushes.DarkGray;
+                                }
+                                else if (color == "§9")
+                                {
+                                    realColor = Brushes.Blue;
+                                }
+                                else if (color == "§a")
+                                {
+                                    realColor = Brushes.Green;
+                                }
+                                else if (color == "§b")
+                                {
+                                    realColor = Brushes.Aqua;
+                                }
+                                else if (color == "§c")
+                                {
+                                    realColor = Brushes.Red;
+                                }
+                                else if (color == "§d")
+                                {
+                                    realColor = Brushes.Pink;
+                                }
+                                else if (color == "§e")
+                                {
+                                    realColor = Brushes.Yellow;
+                                }
+                                else if (color == "§f")
+                                {
+                                    realColor = Brushes.White;
+                                }
+                                else if (color == "§g")
+                                {
+                                    realColor = Brushes.DarkGoldenrod;
+                                }
+                                Run commandLineTemp2 = new Run(tempStr) { Foreground = realColor };
+                                commandTemp.Inlines.Add(commandLineTemp2);
+                                tempStr = "";
+                            }
+                            color = i[j].ToString() + i[j + 1].ToString();
+                            ++j;
+                            continue;
+                        }
+                        else
+                        {
+                            tempStr += i[j];
+                        }
+                    }
+                }
+                Run commandLineTemp = new Run(tempStr) { Foreground = realColor };
+                commandTemp.Inlines.Add(commandLineTemp);
+                ConsoleTextBox.Document.Blocks.Add(commandTemp);
+                */
+
             }
         }
 
         private void SaveLogBtn_Click(object sender, RoutedEventArgs e)
         {
+            string prepare = "-----Aurora Server Manager Log-----\n时间:" + DateTime.Now + "\n配置:\n    ";
+            prepare += "CPU:" + Tools.GetComputerInfo.GetCpuInfo() + "\n    ";
+            prepare += "内存:" + Tools.GetComputerInfo.GetMemoryInfo() + "\n";
+            prepare += "-----控制台-----" + "\n";
+            Log = prepare + Log;
             using (StreamWriter sw = new StreamWriter("ASM/Log.txt"))
             {
                     sw.WriteLine(Log);
@@ -286,17 +394,89 @@ namespace AuroraServer
                     Console.WriteLine(line);
                 }
             }
-            MessageExt.Instance.ShowYesNo("Successfully saved the log file to \n"+now_path+"ASM/Log.txt"+ "\n\nWhether to open the log file?", "Notice", new Action(() => {
+            MessageExt.Instance.ShowYesNo("已成功将Log文件保存至\n"+now_path+"ASM/Log.txt"+ "\n\n需要打开日志文件吗?", "提示", new Action(() => {
                     Process.Start(now_path + "ASM/Log.txt");
             }));
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MessageExt.Instance.ShowYesNo("Confirm to close this program?", "Warning", new Action(() => { Process.GetCurrentProcess().Kill(); }));
+            MessageExt.Instance.ShowYesNo("确定关闭该系统?", "警告", new Action(() => { Process.GetCurrentProcess().Kill(); }));
             e.Cancel = true;
         }
 
-        
+        private void PlayerListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if(PlayerListBox.Items.Count > 0 && PlayerListBox.SelectedItems.Count != 0)
+            {
+                PlayerControlGrid.Visibility = Visibility.Visible;
+                PlayerControlNameLabel.Content = PlayerListBox.SelectedItem;
+            }
+        }
+
+        private void PlayerControlClose_Click(object sender, RoutedEventArgs e)
+        {
+            PlayerControlGrid.Visibility = Visibility.Hidden;
+        }
+
+        private void PlayerControlBan_Click(object sender, RoutedEventArgs e)
+        {
+            MessageExt.Instance.ShowYesNo("确认要封禁玩家" + PlayerControlNameLabel.Content + "吗?", "提示", new Action(() =>
+            {
+                this.Dispatcher.Invoke((Action)async delegate ()
+                {
+                    RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+                    await rcon.ConnectAsync();
+                    await rcon.SendCommandAsync("ban " + PlayerControlNameLabel.Content);
+                    await rcon.SendCommandAsync("tellraw @a [{\"text\":\"ASM\",\"color\":\"aqua\",\"bold\":true},{\"text\":\" >>> \",\"color\":\"green\",\"bold\":false},{\"text\":\"" + PlayerControlNameLabel.Content + "已被封禁\",\"color\":\"gold\"}]");
+                });
+            }));
+            PlayerControlGrid.Visibility = Visibility.Hidden;
+        }
+
+        private void PlayerControlKick_Click(object sender, RoutedEventArgs e)
+        {
+            MessageExt.Instance.ShowYesNo("确认要踢出玩家" + PlayerControlNameLabel.Content + "吗?", "提示", new Action(() =>
+            {
+                this.Dispatcher.Invoke((Action)async delegate ()
+                {
+                    RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+                    await rcon.ConnectAsync();
+                    await rcon.SendCommandAsync("kick " + PlayerControlNameLabel.Content);
+                    await rcon.SendCommandAsync("tellraw @a [{\"text\":\"ASM\",\"color\":\"aqua\",\"bold\":true},{\"text\":\" >>> \",\"color\":\"green\",\"bold\":false},{\"text\":\"" + PlayerControlNameLabel.Content + "已被踢出\",\"color\":\"gold\"}]");
+                });
+            }));
+            PlayerControlGrid.Visibility = Visibility.Hidden;
+        }
+
+        private void PlayerControlOP_Click(object sender, RoutedEventArgs e)
+        {
+            MessageExt.Instance.ShowYesNo("确认要将玩家" + PlayerControlNameLabel.Content + "的权限变更为管理员吗?", "提示", new Action(() =>
+            {
+                this.Dispatcher.Invoke((Action)async delegate ()
+                {
+                    RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+                    await rcon.ConnectAsync();
+                    await rcon.SendCommandAsync("op " + PlayerControlNameLabel.Content);
+                    await rcon.SendCommandAsync("tellraw @a [{\"text\":\"ASM\",\"color\":\"aqua\",\"bold\":true},{\"text\":\" >>> \",\"color\":\"green\",\"bold\":false},{\"text\":\"" + PlayerControlNameLabel.Content + "的权限等级已调整为管理员\",\"color\":\"gold\"}]");
+                });
+            }));
+            PlayerControlGrid.Visibility = Visibility.Hidden;
+        }
+
+        private void PlayerControlDEOP_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            MessageExt.Instance.ShowYesNo("确认要将玩家" + PlayerControlNameLabel.Content + "的权限变更为成员吗?", "提示", new Action(() =>
+            {
+                this.Dispatcher.Invoke((Action)async delegate ()
+                {
+                    RCON rcon = new RCON(IPAddress.Parse(IP_address), Port, Password);
+                    await rcon.ConnectAsync();
+                    await rcon.SendCommandAsync("deop " + PlayerControlNameLabel.Content);
+                    await rcon.SendCommandAsync("tellraw @a [{\"text\":\"ASM\",\"color\":\"aqua\",\"bold\":true},{\"text\":\" >>> \",\"color\":\"green\",\"bold\":false},{\"text\":\"" + PlayerControlNameLabel.Content + "的权限等级已调整为成员\",\"color\":\"gold\"}]");
+                });
+            }));
+            PlayerControlGrid.Visibility = Visibility.Hidden;
+        }
     }
 }

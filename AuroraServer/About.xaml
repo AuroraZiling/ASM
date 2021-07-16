@@ -32,19 +32,6 @@
 
                     </Grid>
                 </TabItem>
-                <TabItem Header="  Legal Statement" Margin="10.2,0,-28,-1.6">
-                    <Grid Background="#FFE5E5E5">
-                        <Label Content="Disclaimers" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                        <Label Content="The copyright of all resources provided by this software belongs to their copyright owners. &#xD;&#xA;If legal disputes and consequences result from the use of this software,&#xD;&#xA; you are responsible for them and this software is not responsible for them. &#xD;&#xA;Use of this software means that the user is aware of the above content." HorizontalAlignment="Left" Margin="40,40,0,0" VerticalAlignment="Top" Height="70"/>
-                        <Label Content="Privacy Policy" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
-                        <Label Content="The software will not upload any information about you." HorizontalAlignment="Left" Margin="40,147,0,0" VerticalAlignment="Top" Height="26"/>
-                        <Label Content="Service Discontinuation" HorizontalAlignment="Left" Margin="10,178,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
-                        <Label Content="If a cracked version of the Software is used, or if an unofficial version of the Software is decompiled, &#xD;&#xA;distributed or tampered with, the Developer reserves the right to suspend the provision of some or all services to the User. &#xD;&#xA;The user is liable for all corresponding legal responsibilities." HorizontalAlignment="Left" Margin="40,210,0,0" VerticalAlignment="Top" Height="57"/>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="  License and Copyright Notice" Margin="27,0,-54,-0.6">
-                    <Grid Background="#FFE5E5E5"/>
-                </TabItem>
             </controls:MetroTabControl>
         </Grid>
 

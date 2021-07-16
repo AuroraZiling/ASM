@@ -6,7 +6,7 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:local="clr-namespace:AuroraServer"
         mc:Ignorable="d"
-        Title="Aurora Server Manager" Height="450" Width="800" TitleCharacterCasing="Normal" Icon="ASM.png" ShowInTaskbar="False" ResizeMode="CanMinimize">
+        Title="Aurora Server Manager" Height="450" Width="800" TitleCharacterCasing="Normal" Icon="ASM.png" ShowInTaskbar="False" ResizeMode="CanMinimize" FontFamily="Microsoft YaHei">
     <Grid HorizontalAlignment="Left" Margin="0,0,-6.4,0" Width="800">
         <Grid.Background>
             <ImageBrush ImageSource="background.png"/>
@@ -17,11 +17,11 @@
             </Grid.Background>
             <Label Content="Aurora Server Manager" Margin="56,10,56,0" VerticalAlignment="Top" FontSize="24" FontFamily="Microsoft YaHei"/>
 
-            <Label Content="{DynamicResource IP Address:}" HorizontalAlignment="Right" Margin="0,160,271,0" VerticalAlignment="Top"/>
+            <Label Content="IP地址:" HorizontalAlignment="Right" Margin="0,160,271,0" VerticalAlignment="Top"/>
             <TextBox x:Name="IP_Textbox" HorizontalAlignment="Left" Height="23" Margin="140,160,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="198" TextChanged="IP_Textbox_TextChanged"/>
-            <Label Content="{DynamicResource Rcon Port:}" HorizontalAlignment="Right" Margin="0,199,271,0" VerticalAlignment="Top"/>
+            <Label Content="Rcon 端口:" HorizontalAlignment="Right" Margin="0,199,271,0" VerticalAlignment="Top"/>
             <TextBox x:Name="Port_Textbox" HorizontalAlignment="Left" Height="23" Margin="140,199,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="198" Text="25575" TextChanged="Port_Textbox_TextChanged" PreviewKeyDown="Port_Textbox_PreviewKeyDown"/>
-            <Label Content="{DynamicResource Rcon Password:}" HorizontalAlignment="Right" Margin="0,240,271,0" VerticalAlignment="Top"/>
+            <Label Content="Rcon 密码:" HorizontalAlignment="Right" Margin="0,240,271,0" VerticalAlignment="Top"/>
             <Frame Content="Frame" Height="1" Margin="40,49,40,0" VerticalAlignment="Top" Background="Black" RenderTransformOrigin="0.5,0.5">
                 <Frame.RenderTransform>
                     <TransformGroup>
@@ -32,8 +32,8 @@
                     </TransformGroup>
                 </Frame.RenderTransform>
             </Frame>
-            <Button x:Name="ConnectButton" Content="{DynamicResource Connect}" Margin="55,331,56,0" VerticalAlignment="Top" controls:ControlsHelper.ContentCharacterCasing="Normal" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" BorderBrush="Black" Foreground="White" Click="ConnectButton_Click"/>
-            <Label Content="Version 1.1" HorizontalAlignment="Left" Margin="270,52,0,0" VerticalAlignment="Top"/>
+            <Button x:Name="ConnectButton" Content="连接" Margin="55,331,56,0" VerticalAlignment="Top" controls:ControlsHelper.ContentCharacterCasing="Normal" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" BorderBrush="Black" Foreground="White" Click="ConnectButton_Click" FontFamily="Microsoft YaHei" FontWeight="Bold"/>
+            <Label Content="Ver 1.2" HorizontalAlignment="Left" Margin="310,52,0,0" VerticalAlignment="Top"/>
             <PasswordBox x:Name="Password_Passwordbox" HorizontalAlignment="Left" Margin="140,240,0,0" VerticalAlignment="Top" Width="198"/>
 
         </Grid>
@@ -43,18 +43,11 @@
             </Grid.Background>
 
         </Grid>
-        <Button x:Name="AboutBtn" Content="{DynamicResource About}" Margin="710,382,10,0" VerticalAlignment="Top" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" BorderBrush="Black" RenderTransformOrigin="0.5,0.5" controls:ControlsHelper.ContentCharacterCasing="Normal" FontFamily="Microsoft YaHei" Click="AboutBtn_Click">
+        <Button x:Name="AboutBtn" Content="关于" Margin="710,382,10,0" VerticalAlignment="Top" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" BorderBrush="Black" RenderTransformOrigin="0.5,0.5" controls:ControlsHelper.ContentCharacterCasing="Normal" FontFamily="Microsoft YaHei" Click="AboutBtn_Click">
             <Button.Background>
                 <SolidColorBrush Color="#FF00A3F7" Opacity="0.9"/>
             </Button.Background>
         </Button>
-        <ComboBox x:Name="LanguageSelectComboBox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="158" SelectionChanged="LanguageSelectComboBox_SelectionChanged">
-            <ComboBox.Background>
-                <SolidColorBrush Color="White" Opacity="0.9"/>
-            </ComboBox.Background>
-            <ComboBoxItem x:Name="LanguageSChineseComboBoxItem" Content="简体中文" IsSelected="True"/>
-            <ComboBoxItem x:Name="LanguageEnglishUSComboBoxItem" Content="English (US)"/>
-        </ComboBox>
     </Grid>
 
 </controls:MetroWindow>

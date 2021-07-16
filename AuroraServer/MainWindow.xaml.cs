@@ -1,27 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using CoreRCON;
-using CoreRCON.Parsers.Standard;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
+using System.Net.Sockets;
 
 namespace AuroraServer
 {
@@ -33,7 +25,6 @@ namespace AuroraServer
         public string IP_address = "127.0.0.1";
         public ushort Port = 25575;
         public string Password = "";
-        public string LanguageShow = "zh_CN";
 
         public static string now_path = Environment.CurrentDirectory.Replace("\\", "/") + "/";
         public MainWindow()
@@ -44,17 +35,6 @@ namespace AuroraServer
             MessageExt.Instance.ShowDialog = ShowDialog;
             MessageExt.Instance.ShowYesNo = ShowYesNo;
 
-            
-            using (StreamReader file = File.OpenText(now_path + "ASM/settings.json"))
-            {
-                using (JsonTextReader reader = new JsonTextReader(file))
-                {
-                    JObject o = (JObject)JToken.ReadFrom(reader);
-                    LanguageShow = o["Language"].ToString();
-                    Languages.LanguageChanger.Updatelanguage(LanguageShow);
-                    LanguageSelectComboBox.SelectedItem = LanguageShow;
-                }
-            }
             using (StreamReader file = File.OpenText(now_path + "ASM/connect.json"))
             {
                 using (JsonTextReader reader = new JsonTextReader(file))
@@ -86,11 +66,6 @@ namespace AuroraServer
             {
                 File.Create(now_path + "ASM/connect.json").Dispose();
                 ExtractResFile("AuroraServer.ExampleFiles.example_connect.json", now_path + "ASM/connect.json");
-            }
-            if (File.Exists(now_path + "ASM/settings.json") == false)
-            {
-                File.Create(now_path + "ASM/settings.json").Dispose();
-                ExtractResFile("AuroraServer.ExampleFiles.example_settings.json", now_path + "ASM/settings.json");
             }
         }
 
@@ -164,7 +139,7 @@ namespace AuroraServer
         {
             var mySettings = new MetroDialogSettings()
             {
-                AffirmativeButtonText = "Close",
+                AffirmativeButtonText = "关闭",
                 ColorScheme = MetroDialogColorScheme.Theme
             };
             _ = await this.ShowMessageAsync(title, message, MessageDialogStyle.Affirmative, mySettings);
@@ -184,12 +159,18 @@ namespace AuroraServer
 
         public static bool CheckConnect(string ipString, int port) // IP地址检测
         {
-            System.Net.Sockets.TcpClient tcpClient = new System.Net.Sockets.TcpClient()
+            TcpClient tcpClient = new TcpClient()
             { SendTimeout = 1000 };
             IPAddress ip = IPAddress.Parse(ipString);
             try
             {
-                tcpClient.Connect(ip, port);
+                var result = tcpClient.BeginConnect(ipString, port, null, null);
+                var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(3)); //设置超时时间
+                if (!success)
+                {
+                    throw new Exception("Failed to connect.");
+                }
+                tcpClient.EndConnect(result);
             }
             catch (Exception)
             {
@@ -241,12 +222,11 @@ namespace AuroraServer
                         }
                         catch (AuthenticationException)
                         {
-                            MessageExt.Instance.ShowDialog("Your RCON password could not be verified, please check if your password is entered correctly.", "Error");
+                            MessageExt.Instance.ShowDialog("您的RCON密码验证失败", "错误");
                         }
                     }
-                    else
-                    {
-                        MessageExt.Instance.ShowDialog("Unable to connect to the server, please check whether the IP address of the server is correct and whether the port number is open.", "Error");
+                    else {
+                        MessageExt.Instance.ShowDialog("无法连接至服务器，请检查您输入的IP地址和RCON端口是否正确，且保证服务器开启了RCON", "错误");
                     }
                 }
             }
@@ -288,34 +268,6 @@ namespace AuroraServer
         {
             About about_window = new About();
             about_window.ShowDialog();
-        }
-
-        private void LanguageSelectComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            string LanguageSelection = LanguageSelectComboBox.SelectedItem.ToString().Replace("System.Windows.Controls.ComboBoxItem: ", "");
-            if (LanguageSelection == "简体中文")
-            {
-                LanguageSelection = "zh_CN";
-            }
-            else if (LanguageSelection == "English (US)")
-            {
-                LanguageSelection = "en_US";
-            }
-            try
-            {
-                Languages.LanguageChanger.Updatelanguage(LanguageSelection);
-                string jsonString = File.ReadAllText(now_path + "ASM/settings.json", Encoding.Default);
-                JObject jobject = JObject.Parse(jsonString);
-                jobject["Language"] = LanguageSelection;
-                string convertString = Convert.ToString(jobject);
-                File.WriteAllText(now_path + "ASM/settings.json", convertString);
-            }
-            catch
-            {
-                File.Create(now_path + "ASM/settings.json").Dispose();
-                ExtractResFile("AuroraServer.ExampleFiles.example_settings.json", now_path + "ASM/settings.json");
-            }
-
         }
     }
 }
