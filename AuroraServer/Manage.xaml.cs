@@ -119,23 +119,6 @@ namespace AuroraServer
                 await rcon.ConnectAsync();
                 Title = "ASM - 管理: " + IP_address + ':' + Port.ToString();
                 LogUpdate("\nRCON服务器已成功连接 IP:"+IP_address+" Port:"+Port.ToString(), null, null);
-                
-                /*
-                LogUpdate("\nTrying to open the listening interface...", null);
-                Task PlayerListener = Task.Run(() => // 监听玩家聊天(未完成)
-                {
-                    while (true)
-                    {
-                        var log = new LogReceiver(50000, new IPEndPoint(IPAddress.Parse(IP_address), Port));
-                        log.Listen<ChatMessage>(chat =>
-                        {
-                            LogUpdate($"Chat message: {chat.Player.Name} said {chat.Message} on channel {chat.Channel}", null);
-                        });
-                        log.Dispose();
-                    }
-                });
-                LogUpdate("\nListening interface has been successfully opened.", null);
-                */
                 LogUpdate("\n正在尝试打开玩家检测器...", null, null);
                 Task PlayerUpdate = Task.Run(() =>
                 {
